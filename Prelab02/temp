@@ -1,0 +1,13 @@
+bad_sim.c: In function ‘main’:
+bad_sim.c:8: error: subscripted value is neither array nor pointer
+bad_sim.c:12: warning: initialization makes integer from pointer without a cast
+bad_sim.c:13: error: subscripted value is neither array nor pointer
+bad_sim.c:15: error: subscripted value is neither array nor pointer
+bad_sim.c:15: error: subscripted value is neither array nor pointer
+bad_sim.c:16: error: subscripted value is neither array nor pointer
+bad_sim.c:16: error: subscripted value is neither array nor pointer
+bad_sim.c:18: error: ‘exec1’ undeclared (first use in this function)
+bad_sim.c:18: error: (Each undeclared identifier is reported only once
+bad_sim.c:18: error: for each function it appears in.)
+bad_sim.c:19: error: ‘exec2’ undeclared (first use in this function)
+bad_sim.c:20: error: subscripted value is neither array nor pointer

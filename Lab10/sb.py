@@ -1,0 +1,119 @@
+import sys
+from PySide.QtGui import *
+from BasicUI import *
+import re, string
+
+class EntryApplication(QMainWindow, Ui_MainWindow):
+
+    states = ["AK", "AL", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY",
+              "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND",
+              "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
+
+    def __init__(self, parent=None):
+
+        super(EntryApplication, self).__init__(parent)
+        self.setupUi(self)
+
+        self.states = ["AK", "AL", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY",
+              "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND",
+              "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
+
+        self.text = [self.txtFirstName, self.txtLastName, self.txtAddress, self.txtCity, self.txtState, self.txtEmail, self.txtZip]
+        self.btnClear.clicked.connect(self.Clear)
+        self.btnSave.clicked.connect(self.Save)
+        self.btnLoad.clicked.connect(self.loadData)
+
+        for i in self.text:     # when txt is changed, set Load enable off
+            i.textChanged.connect(self.LS)
+
+
+
+    def loadFromXmlFile(self, filePath):
+        """
+        Handling the loading of the data from the given file name. This method should only be  invoked by the
+        'loadData' method.
+        """
+        with open(filePath, 'r') as f:
+            lines = [x.strip() for x in f.readlines()]   # remove /t /n
+            for element in lines[2:]:
+                if 'FirstName' in element:
+                    self.txtFirstName.setText(element[11:-12])
+                if 'LastName' in element:
+                    self.txtLastName.setText(element[10:-11])
+                if 'Address' in element:
+                    self.txtAddress.setText(element[9:-10])
+                if 'City' in element:
+                    self.txtCity.setText(element[6:-7])
+                if 'State' in element:
+                    self.txtState.setText(element[7:-8])
+                if 'ZIP' in element:
+                    self.txtZip.setText(element[5:-6])
+                if 'Email' in element:
+                    self.txtEmail.setText(element[7:-8])
+
+    def loadData(self):
+        """
+        Obtain a file name from a file dialog, and pass it on to the loading method. This is to facilitate automated
+        testing. Invoke this method when clicking on the 'load' button.
+        *** DO NOT MODIFY THIS METHOD, OR THE TEST WILL NOT PASS! ***
+        """
+        filePath, _ = QFileDialog.getOpenFileName(self, caption='Open XML file ...', filter="XML files (*.xml)")
+
+        if not filePath:
+            return
+
+        self.loadFromXmlFile(filePath)
+
+
+    def Clear(self):
+        for element in self.text:
+            element.clear()
+            self.btnSave.setEnabled(False)
+            self.btnLoad.setEnabled(True)
+
+
+
+    def LS(self):
+        for element in self.text:
+            if element.text() is not None:
+                self.btnLoad.setEnabled(False)
+                self.btnSave.setEnabled(True)
+
+
+
+    def Save(self):
+        self.lblError.clear()
+        for i in self.text:
+            if(i.text() == ''):
+                self.lblError.setText('Error: All entries must be populated.')
+                return
+        if self.txtState.text() not in self.states:
+            self.lblError.setText('Error: State must be one fo the valid US states.')
+            return
+        if len(self.txtZip.text()) != 5:
+            self.lblError.setText('Error: The Zip code must be a 5-digit number.')
+            return
+        mf = re.search(r'(\w+@\w+\.\w+)', self.txtEmail.text())   # email flag
+        if(mf is None):
+            self.lblError.setText('Error: The Email must have a valid email format')
+            return
+        f = open('target.xml', 'w')
+        f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        f.write('<user>\n')
+        f.write('\t<FirstName>' + self.txtFirstName.text() + '</FirstName>\n')
+        f.write('\t<LastName>' + self.txtLastName.text() + '</LastName>\n')
+        f.write('\t<Address>' + self.txtAddress.text() + '</Address>\n')
+        f.write('\t<City>' + self.txtCity.text() + '</City>\n')
+        f.write('\t<State>' + self.txtState.text() + '</State>\n')
+        f.write('\t<ZIP>' + self.txtZip.text() + '</ZIP>\n')
+        f.write('\t<Email>' + self.txtEmail.text() + '</Email>\n')
+        f.write('</user>\n')
+
+
+
+if __name__ == "__main__":
+    currentApp = QApplication(sys.argv)
+    currentForm = EntryApplication()
+
+    currentForm.show()
+    currentApp.exec_()

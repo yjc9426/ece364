@@ -1,0 +1,6 @@
+test.bash
+sensor_sum.sh
+exist.bash
+sum.bash
+sbsb
+abc
